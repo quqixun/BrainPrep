@@ -1,3 +1,3 @@
 # Preprocessing on Brain MRI Sequence
 
-This is a pipline to preprocess brain MRI sequence.
+This is a pipeline to preprocess brain MRI sequence by using FSL.
