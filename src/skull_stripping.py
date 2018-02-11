@@ -1,31 +1,13 @@
+from __future__ import print_function
+
 import os
 import subprocess
-import numpy as np
-import nibabel as nib
 from multiprocessing import Pool, cpu_count
-from scipy.ndimage.morphology import binary_fill_holes
 
 
 def create_dir(path):
     if not os.path.isdir(path):
         os.makedirs(path)
-
-
-def load_nii(path):
-    return np.flipud(nib.load(path).get_data())
-
-
-def save_nii(data, path):
-    nib.save(nib.Nifti1Image(data, np.eye(4)), path)
-    return
-
-
-def mask(in_path, out_path, mask_path):
-    in_volume = load_nii(in_path)
-    mask_volume = binary_fill_holes(load_nii(mask_path))
-    out_volume = np.multiply(in_volume, mask_volume).astype(in_volume.dtype)
-    save_nii(out_volume, out_path)
-    return
 
 
 def bet(src_path, dst_path, frac="0.5"):
