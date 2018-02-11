@@ -15,11 +15,12 @@ def create_dir(path):
 
 
 def load_nii(path):
-    return nib.load(path).get_data()
+    nii = nib.load(path)
+    return nii.get_data(), nii.get_affine()
 
 
-def save_nii(data, path):
-    nib.save(nib.Nifti1Image(data, np.eye(4)), path)
+def save_nii(data, path, affine):
+    nib.save(nib.Nifti1Image(data, affine), path)
     return
 
 
@@ -79,16 +80,16 @@ def unwarp_segment(arg, **kwarg):
     return segment(*arg, **kwarg)
 
 
-def segment(src_path, dst_path, labels_path, method="km"):
+def segment(src_path, dst_path, labels_path=None, method="km"):
     print("Segment on: ", src_path)
     try:
-        data = load_nii(src_path)
+        data, affine = load_nii(src_path)
         n_clusters = 3
 
         if method == "km":
             # Method 1 - KMeans
             labels = kmeans_cluster(data, n_clusters)
-        else:
+        elif method == "fcm":
             # Method 2 - Fuzzy CMeans
             labels = fuzzy_cmeans_cluster(data, n_clusters)
 
@@ -98,8 +99,8 @@ def segment(src_path, dst_path, labels_path, method="km"):
         gm_mask[np.where(gm_mask == target)] = 1.
         data = data.astype(np.float32)
         gm = np.multiply(data, gm_mask)
-        save_nii(labels, labels_path)
-        save_nii(gm, dst_path)
+        save_nii(labels, labels_path, affine)
+        save_nii(gm, dst_path, affine)
     except RuntimeError:
         print("\tFalid on: ", src_path)
 

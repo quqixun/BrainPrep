@@ -64,7 +64,7 @@ def postprocess(src_path, dst_path, temp_path=None, is_mask=False):
             mask = load_nii(temp_path)
             data = brain_mask(data, mask)
         data = resize(data)
-        data = norm(data)
+        # data = norm(data)
         save_nii(data, dst_path)
     except RuntimeError:
         print("\tFalid on: ", src_path)
@@ -72,8 +72,8 @@ def postprocess(src_path, dst_path, temp_path=None, is_mask=False):
 
 parent_dir = os.path.dirname(os.getcwd())
 data_dir = os.path.join(parent_dir, "data")
-data_src_dir = os.path.join(data_dir, "ADNIKMSegment")
-data_dst_dir = os.path.join(data_dir, "ADNIPostProcess4")
+data_src_dir = os.path.join(data_dir, "ADNISegment")
+data_dst_dir = os.path.join(data_dir, "ADNISegmentPost")
 data_labels = ["AD", "NC"]
 create_dir(data_dst_dir)
 
@@ -83,9 +83,8 @@ for label in data_labels:
     dst_label_dir = os.path.join(data_dst_dir, label)
     create_dir(dst_label_dir)
     for subject in os.listdir(src_label_dir):
-        subj_name = subject + ".nii.gz"
-        data_src_paths.append(os.path.join(src_label_dir, subject, subj_name))
-        data_dst_paths.append(os.path.join(dst_label_dir, subj_name))
+        data_src_paths.append(os.path.join(src_label_dir, subject))
+        data_dst_paths.append(os.path.join(dst_label_dir, subject))
 
 temp_path = os.path.join(data_dir, "Template", "bianca_exclusion_mask.nii.gz")
 
@@ -99,24 +98,3 @@ paras = zip(data_src_paths, data_dst_paths,
             [temp_path] * subj_num, [is_mask] * subj_num)
 pool = Pool(processes=cpu_count())
 pool.map(unwarp_postprocess, paras)
-
-
-# For another dataset
-data_src_dir = os.path.join(data_dir, "ADNIEnhancePost")
-data_dst_dir = os.path.join(data_dir, "ADNIEnhancePost3")
-data_labels = ["AD", "NC"]
-create_dir(data_dst_dir)
-
-data_src_paths, data_dst_paths = [], []
-for label in data_labels:
-    src_label_dir = os.path.join(data_src_dir, label)
-    dst_label_dir = os.path.join(data_dst_dir, label)
-    create_dir(dst_label_dir)
-    for subject in os.listdir(src_label_dir):
-        data_src_paths.append(os.path.join(src_label_dir, subject))
-        data_dst_paths.append(os.path.join(dst_label_dir, subject))
-
-# Multi-processing
-paras = zip(data_src_paths, data_dst_paths)
-pool = Pool(processes=cpu_count())
-# pool.map(unwarp_postprocess, paras)

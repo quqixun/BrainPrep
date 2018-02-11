@@ -13,11 +13,12 @@ def create_dir(path):
 
 
 def load_nii(path):
-    return nib.load(path).get_data()
+    nii = nib.load(path)
+    return nii.get_data(), nii.get_affine()
 
 
-def save_nii(data, path):
-    nib.save(nib.Nifti1Image(data, np.eye(4)), path)
+def save_nii(data, path, affine):
+    nib.save(nib.Nifti1Image(data, affine), path)
     return
 
 
@@ -62,12 +63,12 @@ def enhance(src_path, dst_path, kernel_size=3,
             percentils=[0.5, 99.5], bins_num=256, eh=True):
     print("Preprocess on: ", src_path)
     try:
-        volume = load_nii(src_path)
+        volume, affine = load_nii(src_path)
         volume = denoise(volume, kernel_size)
         volume = rescale_intensity(volume, percentils, bins_num)
         if eh:
             volume = equalize_hist(volume, bins_num)
-        save_nii(volume, dst_path)
+        save_nii(volume, dst_path, affine)
     except RuntimeError:
         print("\tFailed on: ", src_path)
 
