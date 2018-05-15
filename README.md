@@ -80,7 +80,8 @@ python enahncement.py
 
 ## 9. Tissue Segmentation (optional)
 
-Based on outputs from step 7, run segment.py to segment brain into GM, WM and CSF by **KMeans** or **Fuzzy-CMeans**.
+Based on outputs from step 7, run segment.py to segment brain into GM, WM and CSF  
+by **KMeans** or **Fuzzy-CMeans** (you should change settings in script).
 ```
 python segment.py
 ```
